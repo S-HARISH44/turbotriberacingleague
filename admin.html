@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTRL | Mission Control</title>
     
-    <!-- Fonts: Clean & Professional -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@900&display=swap" rel="stylesheet">
@@ -16,71 +16,56 @@
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Added for Result Generator -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            prefix: 'tw-', // Prevent tailwind from overriding admin panel styles
+            corePlugins: {
+                preflight: false, // Disable base reset to protect admin panel styles
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
+        /* ================== ADMIN PANEL STYLES ================== */
         :root {
             /* --- VIBRANT LIGHT PALETTE --- */
             --bg-body: #e2e8f0;      
             --bg-panel: #ffffff;
             --bg-header: #f8fafc;
-            
             --sidebar-bg: #0f172a;   
             --sidebar-text: #94a3b8;
             --sidebar-text-active: #ffffff;
-            
             --border-dim: #e2e8f0;
             --border-light: #cbd5e1;
-            
             --accent-cyan: #0ea5e9;  
             --accent-red: #ef4444;   
             --accent-green: #10b981; 
             --accent-yellow: #f59e0b; 
             --accent-purple: #8b5cf6; 
-            
             --text-primary: #1e293b;  
             --text-secondary: #475569; 
             --text-muted: #94a3b8;    
-
             --font-display: 'Manrope', sans-serif; 
             --font-ui: 'Inter', sans-serif;
             --font-data: 'JetBrains Mono', monospace;
-
             --sidebar-width: 260px;
             --sidebar-width-collapsed: 72px;
             --header-height: 70px;
-            
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
-
-        /* --- GLOBAL RESET --- */
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
-        
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-primary);
-            font-family: var(--font-ui);
-            height: 100vh;
-            overflow: hidden;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-
+        body { background-color: var(--bg-body); color: var(--text-primary); font-family: var(--font-ui); height: 100vh; overflow: hidden; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 24px 24px; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* --- LAYOUT --- */
         .app-layout { display: flex; height: 100vh; width: 100vw; opacity: 0; transition: opacity 0.5s ease; }
-
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid #1e293b;
-            display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 50; box-shadow: var(--shadow-md);
-        }
+        .sidebar { width: var(--sidebar-width); background: var(--sidebar-bg); border-right: 1px solid #1e293b; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; box-shadow: var(--shadow-md); }
         .sidebar.collapsed { width: var(--sidebar-width-collapsed); }
         .logo-area { height: var(--header-height); display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 12px; overflow: hidden; background: rgba(0,0,0,0.2); }
         .logo-img { height: 36px; width: auto; object-fit: contain; }
@@ -105,8 +90,6 @@
         .sidebar.collapsed .user-panel .btn { justify-content: center; padding: 10px; }
         .sidebar.collapsed .user-panel .btn span { display: none; }
         .sidebar.collapsed .user-panel .btn i { margin: 0; }
-
-        /* --- MAIN WRAPPER --- */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .top-bar { height: var(--header-height); border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: #fff; box-shadow: var(--shadow-sm); z-index: 40; }
         .toggle-sidebar { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
@@ -116,8 +99,6 @@
         .season-input { background: none; border: none; color: var(--text-primary); font-family: var(--font-display); font-weight: 800; font-size: 1rem; text-transform: uppercase; width: 100px; text-align: center; }
         .season-input:focus { color: var(--accent-cyan); }
         .action-cluster { display: flex; gap: 12px; }
-
-        /* --- COMPONENTS --- */
         .btn { background: #fff; border: 1px solid var(--border-dim); color: var(--text-secondary); padding: 8px 16px; font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; }
         .btn:hover { border-color: var(--border-light); color: var(--text-primary); background: #f8fafc; transform: translateY(-1px); }
         .btn-primary { background: var(--accent-cyan); color: #fff; border: 1px solid var(--accent-cyan); }
@@ -126,76 +107,57 @@
         .btn-danger:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
         .btn-success { color: var(--accent-green); border-color: #a7f3d0; background: #ecfdf5; }
         .btn-success:hover { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
-
         .workspace { flex: 1; padding: 32px; overflow-y: auto; position: relative; }
         .section { display: none; animation: fadeIn 0.4s ease-out; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
         .panel { background: #fff; border: 1px solid var(--border-dim); border-radius: 12px; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
         .panel-header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-header); padding: 16px 24px; border-bottom: 1px solid var(--border-dim); }
         .panel-body { padding: 24px; }
         .panel-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         .panel-title i { color: var(--accent-cyan); font-size: 1.1rem; }
-
         .dashboard-grid-full { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px; }
         .dashboard-split { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; height: calc(100vh - 140px); min-height: 600px; }
         .dash-left { overflow-y: auto; display: flex; flex-direction: column; gap: 24px; padding-right: 5px; }
         .dash-right { position: relative; background: rgba(0,0,0,0.4); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-dim); }
-
         .stat-card { background: #fff; border: 1px solid var(--border-dim); padding: 24px; border-radius: 12px; position: relative; overflow: hidden; transition: transform 0.2s; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
         .stat-icon { position: absolute; right: -10px; top: -10px; font-size: 6rem; opacity: 0.1; transform: rotate(15deg); color: var(--text-primary); }
         .stat-label { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
         .stat-value { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
         .stat-footer { margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-family: var(--font-ui); font-weight: 600; }
-        
         .card-accent-blue { background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border-top: 4px solid var(--accent-cyan); }
         .card-accent-red { background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%); border-top: 4px solid var(--accent-red); }
         .card-accent-green { background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-top: 4px solid var(--accent-green); }
         .card-accent-purple { background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%); border-top: 4px solid var(--accent-purple); }
-
         .input-group { margin-bottom: 16px; }
         .input-label { display: block; font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
         .form-control { width: 100%; background: #f8fafc; border: 1px solid var(--border-dim); color: var(--text-primary); padding: 10px 14px; font-family: var(--font-ui); font-size: 0.95rem; border-radius: 6px; transition: all 0.2s; font-weight: 500; }
         .form-control:focus { border-color: var(--accent-cyan); background: #fff; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
-
         .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        
-        /* Updated Driver Card: Outer Border Color */
         .driver-card { background: #fff; border: 2px solid var(--team-color, #94a3b8); border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
         .driver-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
         .driver-info { position: relative; z-index: 2; }
         .driver-info h4 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; font-weight: 700; color: var(--text-primary); }
         .driver-info p { font-family: var(--font-ui); font-size: 0.8rem; color: var(--team-color); filter: brightness(0.8); margin: 4px 0 0; text-transform: uppercase; font-weight: 800; }
-        
-        /* High Z-Index for Delete button so it floats above any potential overlaps */
         .icon-btn { position: relative; z-index: 10; background: #fff; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
         .icon-btn:hover { background: #f1f5f9; color: var(--text-primary); border-color: var(--accent-cyan); }
         .icon-btn.delete:hover { background: #fef2f2; border-color: #fecaca; color: var(--accent-red); }
-        
-        /* Team Strip for Editor Rows */
         .team-strip { width: 8px; height: 100%; position: absolute; left: 0; top: 0; background: var(--team-color, #ccc); }
-
         .tech-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--font-ui); font-size: 0.9rem; }
         .tech-table th { text-align: left; padding: 16px 20px; color: var(--text-secondary); font-family: var(--font-ui); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--border-dim); font-weight: 800; letter-spacing: 0.5px; background: #f8fafc; }
         .tech-table td { padding: 14px 20px; border-bottom: 1px solid var(--border-dim); color: var(--text-primary); font-weight: 500; }
         .tech-table tr:hover td { background: #f8fafc; }
         .tech-table tr:last-child td { border-bottom: none; }
-
-        /* --- MODALS & TOAST --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; }
         .modal-box { background: #fff; border: 1px solid var(--border-dim); width: 90%; max-width: 480px; padding: 32px; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; }
         .modal-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #0f172a; border: 1px solid #1e293b; border-left: 5px solid var(--accent-green); padding: 16px 24px; color: #ffffff; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; font-family: var(--font-ui); font-weight: 600; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border-radius: 8px; display: flex; align-items: center; gap: 10px; }
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast i { color: var(--accent-green); font-size: 1.1rem; }
-
-        /* --- LOGIN SCREEN --- */
         #login-screen { position: fixed; inset: 0; z-index: 999; background: #f1f5f9; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
         .login-card { width: 420px; padding: 48px; background: #fff; border: 1px solid var(--border-dim); border-top: 4px solid var(--accent-cyan); box-shadow: var(--shadow-lg); border-radius: 12px; text-align: center; }
         .login-logo { height: 64px; margin-bottom: 24px; }
-
         @media (max-width: 900px) {
             .app-layout { flex-direction: column; height: auto; min-height: 100vh; }
             .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-dim); }
@@ -208,6 +170,52 @@
             .nav-btn i { margin: 0; font-size: 1.2rem; }
             .workspace { padding: 20px; }
         }
+
+        /* ================== RESULT GENERATOR SPECIFIC STYLES ================== */
+        /* Namespaced with 'rg_' to prevent conflicts with admin panel */
+        #rg_result-card {
+            width: 1280px; height: 720px;
+            background-image: url('https://raw.githubusercontent.com/HARISHWINNER/TTRL-RESOURCES/1de52755d3c67ebb0917c0fcc67ee3ed7bee1a4a/Background/race_res_bg.png'); 
+            background-size: cover; background-position: center; position: relative;
+            color: white; overflow: hidden; flex-shrink: 0;
+            font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;
+        }
+        #rg_preview-title {
+            position: absolute; top: 71px; left: 30px;
+            font-family: 'Orbitron', sans-serif; font-size: 33px; font-weight: 900;
+            white-space: nowrap; letter-spacing: 0.5px; margin: 0; line-height: 1;
+        }
+        #rg_results-table-container { position: absolute; top: 180px; left: 0; width: 100%; height: 490px; overflow: hidden; }
+        :root { --rg-row-height: 24.5px; }
+        #rg_preview-race-body tr { display: block; position: relative; height: var(--rg-row-height); line-height: var(--rg-row-height); font-size: 11px; }
+        #rg_preview-race-body td {
+            position: absolute; top: 0; display: flex; align-items: center;
+            height: var(--rg-row-height); font-size: 11px; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; font-weight: 500; color: #f0f0f0; letter-spacing: 0.25px;
+            padding: 0 4px; box-sizing: border-box;
+        }
+        #rg_preview-race-body td.rg_cell-center { justify-content: center; text-align: center; }
+        
+        /* UPDATED: Moves team logos DOWN slightly (2px) */
+        #rg_preview-race-body .rg_td-team img.rg_team-logo {
+            height: 14px; margin-right: 6px; object-fit: contain; display: inline-block; vertical-align: middle;
+            transform: translateY(2px); -webkit-transform: translateY(2px);
+        }
+        #rg_winner-logo-box { position: absolute; top: 262px; left: 947px; width: 298px; height: 196px; display: flex; justify-content: center; align-items: center; }
+        #rg_winner-logo-box img { height: 140px; object-fit: contain; display:block; }
+        
+        /* UPDATED: Moves winner details (from 475px back to 462px) */
+        #rg_winner-details-box { position: absolute; top: 462px; left: 946px; width: 299px; height: 85px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #rg_winner-name { font-size: 24px; font-weight: 900; color: #eee; margin: 0; line-height: 28px; height: 28px; white-space: nowrap; }
+        #rg_winner-team { font-size: 18px; font-weight: 700; color: #aaa; margin: 0; line-height: 22px; height: 22px; white-space: nowrap; }
+        
+        /* UPDATED: Moves pole position timing to 667px as requested */
+        #rg_footer-awards { position: absolute; top: 676px; left: 552px; font-size: 14px; font-weight: 700; color: #7B5ED7; margin: 0; line-height: 20px; height: 20px; white-space: nowrap; }
+        #rg_preview-pp { display: inline-block; line-height: 20px; height: 20px; }
+        .rg_scrollbar::-webkit-scrollbar { width: 6px; }
+        .rg_scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .rg_scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        .rg_scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
 </head>
 <body>
@@ -248,6 +256,9 @@
                 <a class="nav-btn" onclick="window.switchTab('manage-drivers')"><i class="fas fa-user-plus"></i> <span>DRIVER ONBOARD</span></a>
                 <a class="nav-btn" onclick="window.switchTab('driver-editor')"><i class="fas fa-user-pen"></i> <span>DRIVER EDITOR</span></a>
                 <a class="nav-btn" onclick="window.switchTab('race-director')"><i class="fas fa-flag-checkered"></i> <span>RACE EDITOR</span></a>
+                <!-- Added Result Generator Link -->
+                <div class="nav-group-label">TOOLS</div>
+                <a class="nav-btn" onclick="window.switchTab('result-generator')"><i class="fas fa-image"></i> <span>RESULT GEN</span></a>
             </div>
             <div class="user-panel"><div class="user-panel-row"><div class="user-name" id="userName">OPERATOR</div><div class="user-role">ADMIN</div></div><button class="btn btn-danger" onclick="window.logout()" style="width: 100%; justify-content: center; font-size: 0.75rem;"><i class="fas fa-power-off"></i> <span>DISCONNECT</span></button></div>
         </nav>
@@ -315,6 +326,85 @@
                 <div id="import-preview" class="section">
                     <div class="panel"><div class="panel-header"><div class="panel-title" style="color: var(--accent-green);">IMPORT PREVIEW</div></div><div class="panel-body"><div style="margin-bottom: 24px; font-family: var(--font-data);">DETECTED TRACKS: <span id="detectedTracksList" style="color: var(--accent-green); font-weight:700;"></span></div><div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-dim); margin-bottom: 24px;"><table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table></div><div class="action-cluster" style="justify-content: flex-end;"><button class="btn" onclick="window.cancelImport()">CANCEL</button><button class="btn btn-success" onclick="window.commitImport()">CONFIRM IMPORT</button></div></div></div>
                 </div>
+
+                <!-- ADDED RESULT GENERATOR SECTION -->
+                <div id="result-generator" class="section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title"><i class="fas fa-image"></i> RESULT IMAGE GENERATOR</div>
+                        </div>
+                        <div class="panel-body">
+                            <!-- INTEGRATED GENERATOR CONTAINER -->
+                            <div id="rg_container" class="tw-w-full tw-bg-gray-900 tw-text-white tw-font-sans tw-p-4 tw-rounded-xl">
+                                <div class="tw-flex tw-flex-col xl:tw-flex-row tw-gap-6 tw-p-4">
+                                    
+                                    <!-- GENERATOR CONTROLS -->
+                                    <div class="tw-w-full xl:tw-w-1/3 tw-bg-gray-800 tw-p-5 tw-rounded-xl tw-shadow-lg tw-border tw-border-gray-700 tw-h-fit">
+                                        <div class="tw-mb-6">
+                                            <h3 class="tw-text-lg tw-font-bold tw-text-red-500 tw-mb-3 tw-border-b tw-border-gray-700 tw-pb-1">Event Details</h3>
+                                            <div class="tw-space-y-3">
+                                                <input type="text" id="rg_leagueName" value="TTRL SEASON 1" class="tw-w-full tw-bg-gray-700 tw-text-white tw-p-2 tw-rounded tw-text-sm tw-focus:ring-1 tw-focus:ring-red-500 tw-outline-none" placeholder="League Name">
+                                                <input type="text" id="rg_trackName" value="(TRACK NAME) GP 2025" class="tw-w-full tw-bg-gray-700 tw-text-white tw-p-2 tw-rounded tw-text-sm tw-focus:ring-1 tw-focus:ring-red-500 tw-outline-none" placeholder="Track & Year">
+                                            </div>
+                                        </div>
+                                        <div class="tw-mb-6">
+                                            <h3 class="tw-text-lg tw-font-bold tw-text-red-500 tw-mb-3 tw-border-b tw-border-gray-700 tw-pb-1">Pole Position</h3>
+                                            <div class="tw-grid tw-grid-cols-3 tw-gap-2">
+                                                <select id="rg_pp_driver" class="tw-bg-gray-700 tw-text-white tw-p-2 tw-rounded tw-text-xs tw-uppercase tw-outline-none"></select>
+                                                <select id="rg_pp_team" class="tw-bg-gray-700 tw-text-white tw-p-2 tw-rounded tw-text-xs tw-uppercase tw-outline-none"></select>
+                                                <input type="text" id="rg_pp_time" placeholder="Time" value="1:10.123" class="tw-bg-gray-700 tw-text-white tw-p-2 tw-rounded tw-text-xs tw-text-center tw-outline-none">
+                                            </div>
+                                        </div>
+                                        <div class="tw-mb-6">
+                                            <h3 class="tw-text-lg tw-font-bold tw-text-red-500 tw-mb-3 tw-border-b tw-border-gray-700 tw-pb-1">Standings (Top 20)</h3>
+                                            <div class="tw-grid tw-grid-cols-12 tw-gap-1 tw-text-[10px] tw-text-gray-400 tw-mb-2 tw-px-1 tw-font-bold tw-uppercase tw-tracking-wider tw-text-center">
+                                                <span class="tw-col-span-1">#</span>
+                                                <span class="tw-col-span-3 tw-text-left tw-pl-1">Driver</span>
+                                                <span class="tw-col-span-2">Team</span>
+                                                <span class="tw-col-span-1">Grid</span>
+                                                <span class="tw-col-span-1">Stop</span>
+                                                <span class="tw-col-span-2">Time</span>
+                                                <span class="tw-col-span-1">Fast</span>
+                                                <span class="tw-col-span-1">Pts</span>
+                                            </div>
+                                            <div id="rg_race-inputs" class="tw-space-y-1 tw-max-h-[300px] tw-overflow-y-auto tw-pr-1 rg_scrollbar"></div>
+                                        </div>
+                                        <div class="tw-flex tw-flex-col tw-gap-3 tw-pt-2 tw-border-t tw-border-gray-700">
+                                            <div class="tw-flex tw-gap-2">
+                                                <button id="rg_downloadBtn" class="tw-flex-1 tw-bg-red-600 hover:tw-bg-red-700 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-transition-all tw-text-sm tw-uppercase tw-tracking-wide tw-shadow-lg tw-border-none tw-cursor-pointer">
+                                                    <i class="fas fa-download tw-mr-2"></i>Download
+                                                </button>
+                                                <button id="rg_resetBtn" class="tw-bg-gray-600 hover:tw-bg-gray-500 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-transition-all tw-text-sm tw-border-none tw-cursor-pointer">Reset</button>
+                                            </div>
+                                            <label for="rg_importFile" class="tw-flex tw-items-center tw-justify-center tw-w-full tw-bg-blue-600 hover:tw-bg-blue-700 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-cursor-pointer tw-transition-all tw-text-sm tw-uppercase tw-tracking-wide">
+                                                Import Results
+                                            </label>
+                                            <input type="file" id="rg_importFile" class="tw-hidden" accept=".csv">
+                                        </div>
+                                    </div>
+
+                                    <!-- GENERATOR PREVIEW -->
+                                    <div class="tw-w-full xl:tw-w-2/3">
+                                        <div class="tw-bg-gray-800 tw-p-1 tw-rounded-xl tw-shadow-lg tw-border tw-border-gray-700 tw-overflow-x-auto">
+                                            <div class="tw-min-w-max tw-p-4">
+                                                <div id="rg_result-card">
+                                                    <p id="rg_preview-title" class="f1-font-black">TTRL SEASON 1 (TRACK NAME) GP 2025</p>
+                                                    <div id="rg_results-table-container">
+                                                        <table class="tw-w-full tw-h-full tw-border-collapse"><tbody id="rg_preview-race-body"></tbody></table>
+                                                    </div>
+                                                    <div id="rg_winner-logo-box"><img id="rg_winner-logo-placeholder" src="https://placehold.co/200x80/21202e/ffffff?text=TEAM+LOGO" alt="Team logo"></div>
+                                                    <div id="rg_winner-details-box"><p id="rg_winner-name"></p><p id="rg_winner-team"></p></div>
+                                                    <div id="rg_footer-awards"><span id="rg_preview-pp"></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -331,7 +421,8 @@
 
         // GLOBAL BINDINGS
         window.checkLogin = () => {
-            const email = document.getElementById("loginEmail").value;
+            // FIXED: Ensure email is lowercase to match Firestore ID format
+            const email = document.getElementById("loginEmail").value.toLowerCase().trim();
             const pass = document.getElementById("loginPass").value;
             signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "ACCESS DENIED: " + e.message);
         };
@@ -368,10 +459,17 @@
             "kick-sauber": "#52E252", "haas": "#5B5B5B", "reserve": "#666666"
         };
         const TEAMS = [
-            {id:'red-bull-racing', name:'Red Bull Racing'}, {id:'ferrari', name:'Ferrari'}, {id:'mercedes', name:'Mercedes-AMG'},
-            {id:'mclaren', name:'McLaren'}, {id:'aston-martin', name:'Aston Martin'}, {id:'alpine', name:'Alpine'},
-            {id:'williams', name:'Williams'}, {id:'racing-bulls', name:'Visa Cash App RB'}, {id:'kick-sauber', name:'Kick Sauber'},
-            {id:'haas', name:'Haas F1 Team'}, {id:'reserve', name:'Reserve Driver'}
+            {id:'red-bull-racing', name:'Red Bull Racing', short:'Red Bull'}, 
+            {id:'ferrari', name:'Ferrari', short:'Ferrari'}, 
+            {id:'mercedes', name:'Mercedes-AMG', short:'Mercedes'},
+            {id:'mclaren', name:'McLaren', short:'McLaren'}, 
+            {id:'aston-martin', name:'Aston Martin', short:'Aston Martin'}, 
+            {id:'alpine', name:'Alpine', short:'Alpine'},
+            {id:'williams', name:'Williams', short:'Williams'}, 
+            {id:'racing-bulls', name:'Visa Cash App RB', short:'VCARB'}, 
+            {id:'kick-sauber', name:'Kick Sauber', short:'Sauber'},
+            {id:'haas', name:'Haas F1 Team', short:'Haas'}, 
+            {id:'reserve', name:'Reserve Driver', short:'Reserve'}
         ];
 
         const MASTER_TRACK_LIST = [
@@ -402,18 +500,35 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    const adminDocRef = doc(db, "Admin", user.email);
+                    // Force lowercase email lookup to match Firestore ID format
+                    const emailKey = user.email.toLowerCase();
+                    const adminDocRef = doc(db, "Admin", emailKey);
                     const docSnap = await getDoc(adminDocRef); 
+                    
                     if (docSnap.exists()) {
-                        document.getElementById("login-screen").style.display = "none";
-                        document.getElementById("main-interface").style.display = "flex";
-                        setTimeout(() => document.getElementById("main-interface").style.opacity = "1", 50);
-                        document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
-                        initApp();
-                    } else { throw new Error("Doc ID match failed"); }
+                        const adminData = docSnap.data();
+                        
+                        // NEW CHECK: Verify the 'role' field is exactly "Admin"
+                        if (adminData.role === "Admin") {
+                            document.getElementById("login-screen").style.display = "none";
+                            document.getElementById("main-interface").style.display = "flex";
+                            setTimeout(() => document.getElementById("main-interface").style.opacity = "1", 50);
+                            document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
+                            initApp();
+                        } else {
+                            throw new Error("Insufficient Permissions: Role is not Admin");
+                        }
+                    } else { 
+                        throw new Error("User not found in Admin database"); 
+                    }
                 } catch (error) {
                     console.warn("Access verification failed:", error);
-                    signOut(auth).then(() => { document.getElementById("login-msg").innerText = "UNAUTHORIZED OPERATOR"; document.getElementById("login-screen").style.display = "flex"; });
+                    signOut(auth).then(() => { 
+                        const msgDiv = document.getElementById("login-msg");
+                        msgDiv.innerText = "ACCESS DENIED: " + (error.message || "Unauthorized");
+                        msgDiv.style.color = "var(--accent-red)";
+                        document.getElementById("login-screen").style.display = "flex"; 
+                    });
                 }
             } else { 
                 document.getElementById("login-screen").style.display = "flex"; 
@@ -1012,6 +1127,249 @@
             });
         }
 
+        // ================== RESULT GENERATOR LOGIC (IIFE) ==================
+        (function() {
+            // --- CONFIGURATION ---
+            // Fixed base URL for GitHub Raw content
+            const BASE_URL = "https://raw.githubusercontent.com/HARISHWINNER/TTRL-RESOURCES/1de52755d3c67ebb0917c0fcc67ee3ed7bee1a4a/";
+
+            const rg_teamLogos = {
+                "Mercedes": BASE_URL + "LOGOS/Mini%20logos/mercedes.png",
+                "Red Bull": BASE_URL + "LOGOS/Mini%20logos/redbull.png",
+                "Ferrari": BASE_URL + "LOGOS/Mini%20logos/ferrari.png",
+                "McLaren": BASE_URL + "LOGOS/Mini%20logos/mclaren.png",
+                "Alpine": BASE_URL + "LOGOS/Mini%20logos/alpine.png",
+                "Aston Martin": BASE_URL + "LOGOS/Mini%20logos/aston.png", 
+                "Williams": BASE_URL + "LOGOS/Mini%20logos/williams.png",
+                "Haas": BASE_URL + "LOGOS/Mini%20logos/haas.png",
+                "Kick Sauber": BASE_URL + "LOGOS/Mini%20logos/kick_sauber.png",
+                "Racing Bulls": BASE_URL + "LOGOS/Mini%20logos/racing_bulls.png",
+                "Other": "https://placehold.co/200x80/21202e/ffffff?text=TEAM"
+            };
+            
+            const rg_winnerTeamLogos = {
+                "Mercedes": BASE_URL + "LOGOS/mercedes.png",
+                "Red Bull": BASE_URL + "LOGOS/redbull.png",
+                "Ferrari": BASE_URL + "LOGOS/ferrari.png",
+                "McLaren": BASE_URL + "LOGOS/mclaren.png",
+                "Alpine": BASE_URL + "LOGOS/alpine.png",
+                "Aston Martin": BASE_URL + "LOGOS/martin.png", 
+                "Williams": BASE_URL + "LOGOS/williams.png",
+                "Haas": BASE_URL + "LOGOS/haas.png",
+                "Kick Sauber": BASE_URL + "LOGOS/kick_sauber.png",
+                "Racing Bulls": BASE_URL + "LOGOS/vcarb.png",
+                "Other": "https://placehold.co/200x80/21202e/ffffff?text=TEAM"
+            };
+
+            const rg_teamFullNames = {
+                "Mercedes": "MERCEDES", "Red Bull": "RED BULL RACING HONDA RBPT", "Ferrari": "FERRARI", "McLaren": "MCLAREN MERCEDES",
+                "Alpine": "ALPINE RENAULT", "Aston Martin": "ASTON MARTIN MERCEDES", "Williams": "WILLIAMS MERCEDES",
+                "Haas": "HAAS FERRARI", "Kick Sauber": "KICK SAUBER FERRARI", "Racing Bulls": "RACING BULLS HONDA RBPT", "Other": "TEAM NAME"
+            };
+            const rg_csvMap = {
+                "mercedes-amg petronas": "Mercedes", "red bull": "Red Bull", "scuderia ferrari hp": "Ferrari", "mclaren": "McLaren",
+                "alpine": "Alpine", "aston martin": "Aston Martin", "williams": "Williams", "haas": "Haas", "kick sauber": "Kick Sauber",
+                "visa cash app racing bulls": "Racing Bulls"
+            };
+            const rg_initialDrivers = Array.from({ length: 20 }, (_, i) => ({
+                 driver: 'PLAYER NAME', team: 'Other', grid: i + 1, stops: 2, bestLap: '1:11:546', time: '45:47.690', points: i < 10 ? `+${[25,18,15,12,10,8,6,4,2,1][i]}` : '0'
+            }));
+
+            // --- DOM ELEMENTS (Namespaced) ---
+            const el = {
+                inputs: document.getElementById('rg_race-inputs'), previewBody: document.getElementById('rg_preview-race-body'),
+                downloadBtn: document.getElementById('rg_downloadBtn'), resetBtn: document.getElementById('rg_resetBtn'),
+                card: document.getElementById('rg_result-card'), ppDriver: document.getElementById('rg_pp_driver'),
+                ppTeam: document.getElementById('rg_pp_team'), importFile: document.getElementById('rg_importFile'),
+                leagueName: document.getElementById('rg_leagueName'), trackName: document.getElementById('rg_trackName'),
+                ppTime: document.getElementById('rg_pp_time'), winnerLogo: document.getElementById('rg_winner-logo-placeholder'),
+                winnerName: document.getElementById('rg_winner-name'), winnerTeam: document.getElementById('rg_winner-team'),
+                previewPP: document.getElementById('rg_preview-pp'), previewTitle: document.getElementById('rg_preview-title')
+            };
+
+            const ROW_HEIGHT = 24.5;
+            const coords = { pos: { x: 125 }, driver: { x: 396 }, team: { x: 1028 }, grid: { x: 1648 }, stop: { x: 1780 }, best: { x: 1985 }, time: { x: 2270 }, points: { x: 2625 } };
+            const COORD_SCALE = 3;
+
+            function init() {
+                if(!el.ppTeam) return; // Guard clause if elements don't exist yet
+                el.ppTeam.innerHTML = Object.keys(rg_teamLogos).map(team => `<option value="${team}">${team}</option>`).join('');
+                document.getElementById('result-generator').addEventListener('input', updatePreview);
+                el.downloadBtn.addEventListener('click', downloadImage);
+                el.resetBtn.addEventListener('click', resetData);
+                el.importFile.addEventListener('change', handleFileUpload);
+                el.ppDriver.addEventListener('change', handlePoleDriverChange);
+                document.fonts.load('900 33px "Orbitron"').catch(()=>{});
+                document.fonts.load('400 11px "Inter"').catch(()=>{});
+                resetData();
+            }
+
+            function resetData() {
+                el.inputs.innerHTML = ''; 
+                for (let i = 0; i < 20; i++) {
+                    const data = rg_initialDrivers[i] || { driver: 'PLAYER NAME', team: 'Other', grid: i + 1, stops: 2, bestLap: '', time: '', points: '0' };
+                    createRow(data, i);
+                }
+                el.leagueName.value = "TTRL SEASON 1"; el.trackName.value = "(TRACK NAME) GP 2025";
+                el.ppTime.value = '1:10.123'; el.ppTeam.value = "Other";
+                updatePreview();
+            }
+
+            function createRow(data, i) {
+                const div = document.createElement('div');
+                div.className = 'tw-grid tw-grid-cols-12 tw-gap-1 tw-items-center tw-bg-gray-700/50 tw-p-1 tw-rounded hover:tw-bg-gray-700 tw-transition-colors';
+                const teamOpts = Object.keys(rg_teamLogos).map(t => `<option value="${t}" ${data.team === t ? 'selected' : ''}>${t}</option>`).join('');
+                div.innerHTML = `
+                    <span class="tw-col-span-1 tw-text-xs tw-text-gray-400 tw-text-center tw-font-mono">${i + 1}</span>
+                    <input data-idx="${i}" data-f="driver" type="text" value="${data.driver}" class="tw-col-span-3 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-uppercase tw-text-white tw-outline-none focus:tw-ring-1 focus:tw-ring-blue-500">
+                    <select data-idx="${i}" data-f="team" class="tw-col-span-2 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-[10px] tw-text-white tw-outline-none">${teamOpts}</select>
+                    <input data-idx="${i}" data-f="grid" type="text" value="${data.grid}" class="tw-col-span-1 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-text-center tw-text-white tw-outline-none">
+                    <input data-idx="${i}" data-f="stops" type="text" value="${data.stops}" class="tw-col-span-1 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-text-center tw-text-white tw-outline-none">
+                    <input data-idx="${i}" data-f="time" type="text" value="${data.time}" class="tw-col-span-2 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-text-center tw-text-white tw-outline-none tw-placeholder-gray-500" placeholder="Time">
+                    <input data-idx="${i}" data-f="bestLap" type="text" value="${data.bestLap}" class="tw-col-span-1 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-text-center tw-text-white tw-outline-none tw-placeholder-gray-500" placeholder="Fastest">
+                    <input data-idx="${i}" data-f="points" type="text" value="${data.points}" class="tw-col-span-1 tw-bg-gray-600 tw-rounded tw-px-1 tw-py-1 tw-text-xs tw-text-center tw-font-bold tw-text-yellow-400 tw-outline-none">
+                `;
+                el.inputs.appendChild(div);
+            }
+
+            function updatePreview() {
+                el.previewTitle.textContent = `${el.leagueName.value} ${el.trackName.value}`;
+                const currPP = el.ppDriver.value;
+                el.ppDriver.innerHTML = '<option value="PLAYER NAME">Select Driver...</option>';
+                const rows = [];
+                for(let i=0; i<20; i++) {
+                    const dInput = document.querySelector(`[data-idx="${i}"][data-f="driver"]`);
+                    if(!dInput) break; 
+                    const driverVal = dInput.value.toUpperCase();
+                    if(driverVal && driverVal !== 'PLAYER NAME') {
+                        const opt = document.createElement('option');
+                        opt.value = driverVal; opt.textContent = driverVal; el.ppDriver.appendChild(opt);
+                    }
+                    if(!driverVal || !driverVal.trim()) break;
+                    rows.push({
+                        driver: driverVal, team: document.querySelector(`[data-idx="${i}"][data-f="team"]`).value,
+                        grid: document.querySelector(`[data-idx="${i}"][data-f="grid"]`).value, stops: document.querySelector(`[data-idx="${i}"][data-f="stops"]`).value,
+                        bestLap: document.querySelector(`[data-idx="${i}"][data-f="bestLap"]`).value, points: document.querySelector(`[data-idx="${i}"][data-f="points"]`).value,
+                        time: document.querySelector(`[data-idx="${i}"][data-f="time"]`).value
+                    });
+                }
+                if ([...el.ppDriver.options].some(o => o.value === currPP)) el.ppDriver.value = currPP; else el.ppDriver.value = "PLAYER NAME";
+                el.previewBody.innerHTML = '';
+                let winner = null;
+                rows.forEach((data, i) => {
+                    if (i === 0) winner = data;
+                    const tr = document.createElement('tr');
+                    const txtColor = (i === 0) ? '#000000' : '#f0f0f0';
+                    tr.innerHTML = `
+                        <td class="rg_cell-center" style="left:${coords.pos.x/COORD_SCALE}px; width:50px; color:${txtColor};">${i+1}</td>
+                        <td style="left:${coords.driver.x/COORD_SCALE}px; width:154px; color:${txtColor};">${data.driver}</td>
+                        <td class="rg_td-team" style="left:${coords.team.x/COORD_SCALE}px; width:285px; color:${txtColor};">
+                            <img src="${rg_teamLogos[data.team] || rg_teamLogos['Other']}" class="rg_team-logo"><span>${rg_teamFullNames[data.team] || data.team}</span>
+                        </td>
+                        <td class="rg_cell-center" style="left:${coords.grid.x/COORD_SCALE}px; width:48px; color:${txtColor};">${data.grid}</td>
+                        <td class="rg_cell-center" style="left:${coords.stop.x/COORD_SCALE}px; width:60px; color:${txtColor};">${data.stops}</td>
+                        <td class="rg_cell-center" style="left:${coords.best.x/COORD_SCALE}px; width:96px; color:${txtColor};">${data.bestLap}</td>
+                        <td class="rg_cell-center" style="left:${coords.time.x/COORD_SCALE}px; width:109px; color:${txtColor};">${data.time}</td>
+                        <td class="rg_cell-center" style="left:${coords.points.x/COORD_SCALE}px; width:40px; color:${txtColor};">${data.points}</td>
+                    `;
+                    el.previewBody.appendChild(tr);
+                });
+                if(winner) {
+                    el.winnerLogo.src = rg_winnerTeamLogos[winner.team] || rg_winnerTeamLogos['Other'];
+                    el.winnerLogo.onerror = () => { el.winnerLogo.src = rg_winnerTeamLogos['Other']; };
+                    el.winnerName.textContent = winner.driver; el.winnerTeam.textContent = rg_teamFullNames[winner.team] || winner.team;
+                } else {
+                    el.winnerLogo.src = "https://placehold.co/200x80/21202e/ffffff?text=TEAM+LOGO"; el.winnerName.textContent = ""; el.winnerTeam.textContent = "";
+                }
+                const pp = { d: el.ppDriver.value, t: el.ppTeam.value, time: el.ppTime.value };
+                let ppTxt = '';
+                if (pp.d && pp.d !== 'PLAYER NAME') ppTxt += pp.d;
+                if (pp.t && pp.t !== 'Other') ppTxt += (ppTxt ? ' | ' : '') + (rg_teamFullNames[pp.t] || pp.t);
+                if (pp.time) ppTxt += (ppTxt ? ' | ' : '') + pp.time;
+                el.previewPP.textContent = ppTxt;
+            }
+
+            function handlePoleDriverChange() {
+                const sel = el.ppDriver.value;
+                if(sel && sel !== 'PLAYER NAME') {
+                    for(let i=0; i<20; i++) {
+                         const dVal = document.querySelector(`[data-idx="${i}"][data-f="driver"]`);
+                         if(dVal && dVal.value.toUpperCase() === sel) {
+                             el.ppTeam.value = document.querySelector(`[data-idx="${i}"][data-f="team"]`).value;
+                             el.ppTime.value = document.querySelector(`[data-idx="${i}"][data-f="bestLap"]`).value;
+                             break;
+                         }
+                    }
+                }
+                updatePreview();
+            }
+
+            function handleFileUpload(e) {
+                const f = e.target.files[0];
+                if(!f) return;
+                const r = new FileReader();
+                r.onload = (ev) => parseCSV(ev.target.result);
+                r.readAsText(f);
+                e.target.value = '';
+            }
+
+            function parseCSV(txt) {
+                try {
+                    const lines = txt.trim().split(/\r?\n/);
+                    const hLine = lines.find(l => l.startsWith('"Pos."'));
+                    if(!hLine) { alert("Invalid CSV: Header 'Pos.' not found."); return; }
+                    const headers = hLine.split(',').map(h => h.trim().replace(/"/g, ''));
+                    const map = { d: headers.indexOf('Driver'), t: headers.indexOf('Team'), g: headers.indexOf('Grid'), s: headers.indexOf('Stops'), b: headers.indexOf('Best'), ti: headers.indexOf('Time'), p: headers.indexOf('Pts.') };
+                    if(Object.values(map).includes(-1)) { alert("CSV missing required columns."); return; }
+                    const start = lines.indexOf(hLine) + 1;
+                    let count = 0;
+                    for(let i=start; i<lines.length && count<20; i++) {
+                        const l = lines[i];
+                        if(!l || !l.trim()) continue;
+                        const v = l.split(',').map(val => val.trim().replace(/"/g, ''));
+                        if(isNaN(parseInt(v[0]))) break;
+                        const teamKey = rg_csvMap[(v[map.t]||'').toLowerCase()] || 'Other';
+                        document.querySelector(`[data-idx="${count}"][data-f="driver"]`).value = v[map.d] || 'PLAYER NAME';
+                        document.querySelector(`[data-idx="${count}"][data-f="team"]`).value = teamKey;
+                        document.querySelector(`[data-idx="${count}"][data-f="grid"]`).value = v[map.g] || (count+1);
+                        document.querySelector(`[data-idx="${count}"][data-f="stops"]`).value = v[map.s] || 0;
+                        document.querySelector(`[data-idx="${count}"][data-f="bestLap"]`).value = v[map.b] || '';
+                        document.querySelector(`[data-idx="${count}"][data-f="time"]`).value = v[map.ti] || '';
+                        document.querySelector(`[data-idx="${count}"][data-f="points"]`).value = parseInt(v[map.p]) > 0 ? `+${v[map.p]}` : '0';
+                        count++;
+                    }
+                    for(let i=count; i<20; i++) {
+                        document.querySelector(`[data-idx="${i}"][data-f="driver"]`).value = 'PLAYER NAME';
+                        document.querySelector(`[data-idx="${i}"][data-f="team"]`).value = 'Other';
+                        document.querySelector(`[data-idx="${i}"][data-f="grid"]`).value = i+1;
+                        document.querySelector(`[data-idx="${i}"][data-f="stops"]`).value = 0;
+                        document.querySelector(`[data-idx="${i}"][data-f="bestLap"]`).value = '';
+                        document.querySelector(`[data-idx="${i}"][data-f="time"]`).value = '';
+                        document.querySelector(`[data-idx="${i}"][data-f="points"]`).value = '0';
+                    }
+                    updatePreview();
+                } catch(err) { console.error(err); alert("CSV Parse Error"); }
+            }
+
+            async function downloadImage() {
+                el.downloadBtn.textContent = 'Processing...'; el.downloadBtn.disabled = true;
+                try {
+                    await document.fonts.ready;
+                    const imgs = Array.from(el.card.querySelectorAll('img'));
+                    await Promise.all(imgs.map(img => { if(img.complete) return Promise.resolve(); return new Promise(r => { img.onload=r; img.onerror=r; }); }));
+                    await new Promise(r => setTimeout(r, 200));
+                    const canvas = await html2canvas(el.card, { scale: 2, backgroundColor: null, useCORS: true, logging: false });
+                    const link = document.createElement('a');
+                    link.download = `Results_${el.trackName.value.replace(/[^a-z0-9]/gi, '_')}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                } catch(err) { console.error(err); alert("Image Generation Failed"); }
+                finally { el.downloadBtn.innerHTML = '<i class="fas fa-download tw-mr-2"></i>Download'; el.downloadBtn.disabled = false; }
+            }
+
+            // Init call
+            setTimeout(init, 500); // Small delay to ensure DOM is ready
+        })();
     </script>
 </body>
 </html>
